@@ -15,19 +15,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Module1Application implements CommandLineRunner {
 
 
-//	private final PaymentService paymentService;
-//
-//	private final NotificationService notificationService;
+	private final PaymentService paymentService;
+
+	private final NotificationService notificationService;
 
 
-//	public Module1Application(PaymentService paymentService,
-//			@Qualifier("email") NotificationService notificationService) {
-//		this.paymentService = paymentService;
-//		this.notificationService = notificationService;
-//	}
+	public Module1Application(PaymentService paymentService,
+			NotificationService notificationService) {
+		this.paymentService = paymentService;
+		this.notificationService = notificationService;
+	}
 
-	@Autowired
-	Map<String, NotificationService> notificationServices = new HashMap<>();
 
 	public static void main(String[] args) {
 		SpringApplication.run(Module1Application.class, args);
@@ -36,14 +34,8 @@ public class Module1Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-//		paymentService.pay();
-//		notificationService.send("Payment of $100 processed successfully.");
-
-		for(var notificationService: notificationServices.entrySet()) {
-			System.out.println("Notification Service: " + notificationService.getKey());
-			notificationService.getValue().send("Payment of $100 processed successfully.");
-		}
-
+		paymentService.pay();
+		notificationService.send("Payment of $100 processed successfully.");
 	}
 
 }
