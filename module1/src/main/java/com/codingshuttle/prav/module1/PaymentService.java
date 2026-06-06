@@ -3,6 +3,7 @@ package com.codingshuttle.prav.module1;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -14,16 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 //@Repository
 //@Controller
 //@RestController
+@Setter
 public class PaymentService {
 
 	private String paymentType;
 
 	public void pay() {
 		System.out.println("Paying with " + paymentType);
-	}
-
-	public void setPaymentType(String paymentType) {
-		this.paymentType = paymentType;
 	}
 
 	@PostConstruct
