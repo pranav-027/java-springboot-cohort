@@ -1,8 +1,8 @@
 package com.codingshuttle.prav.module2.controller;
 
 
-import com.codingshuttle.prav.module2.entities.EmployeeEntity;
-import com.codingshuttle.prav.module2.repositories.EmployeeRepository;
+import com.codingshuttle.prav.module2.dto.EmployeeDto;
+import com.codingshuttle.prav.module2.services.EmployeeService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,26 +17,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
 
 
-	private final EmployeeRepository employeeRepository;
+	private final EmployeeService employeeService;
 
-	public EmployeeController(EmployeeRepository employeeRepository) {
-		this.employeeRepository = employeeRepository;
+	public EmployeeController(EmployeeService employeeService) {
+		this.employeeService = employeeService;
 	}
 
 	@GetMapping(path = "/{employeeId}")
 	// @PathVariable(name = "employeeId")
-	public EmployeeEntity getEmployeeById(@PathVariable Long employeeId) {
-		return employeeRepository.findById(employeeId).orElse(null);
+	public EmployeeDto getEmployeeById(@PathVariable Long employeeId) {
+		return employeeService.getEmployeeById(employeeId);
 	}
 
 	@GetMapping
-	public List<EmployeeEntity> getEmployees(@RequestParam(required = false) String sortBy) {
-		return employeeRepository.findAll();
+	public List<EmployeeDto> getEmployees(@RequestParam(required = false) String sortBy) {
+		return employeeService.getEmployees();
 	}
 
 	@PostMapping
-	public EmployeeEntity createEmployee(@RequestBody EmployeeEntity employeeDto) {
-		return employeeRepository.save(employeeDto);
+	public EmployeeDto createEmployee(@RequestBody EmployeeDto employeeDto) {
+		return employeeService.createEmployee(employeeDto);
 	}
 
 }
