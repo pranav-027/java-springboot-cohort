@@ -4,26 +4,35 @@ import com.codingshuttle.prav.module2.dto.EmployeeDto;
 import com.codingshuttle.prav.module2.entities.EmployeeEntity;
 import com.codingshuttle.prav.module2.repositories.EmployeeRepository;
 import com.codingshuttle.prav.module2.services.EmployeeService;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
 	private final ModelMapper modelMapper;
+	private final ObjectMapper objectMapper;
 
-	public EmployeeServiceImpl(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
+	public EmployeeServiceImpl(EmployeeRepository employeeRepository, ModelMapper modelMapper, ObjectMapper objectMapper) {
 		this.employeeRepository = employeeRepository;
 		this.modelMapper = modelMapper;
+		this.objectMapper = objectMapper;
 	}
 
 	@Override
 	public EmployeeDto getEmployeeById(long id) {
-		EmployeeEntity employeeEntity = employeeRepository.findById(id).orElse(null);
-		return modelMapper.map(employeeEntity, EmployeeDto.class);
+		Optional<EmployeeEntity> employeeEntity = employeeRepository.findById(id);
+		return employeeEntity.map(entity -> modelMapper.map(entity, EmployeeDto.class))
+				.orElse(null);
 	}
 
 	@Override
@@ -40,5 +49,42 @@ public class EmployeeServiceImpl implements EmployeeService {
 		EmployeeEntity toSaveEntity = modelMapper.map(employeeDto, EmployeeEntity.class);
 		EmployeeEntity savedEntity = employeeRepository.save(toSaveEntity);
 		return modelMapper.map(savedEntity, EmployeeDto.class);
+	}
+
+	@Override
+	public EmployeeDto updateEmployeeById(Long employeeId, EmployeeDto employeeDto) {
+		EmployeeEntity toUpdatedEntity = modelMapper.map(employeeDto, EmployeeEntity.class);
+		toUpdatedEntity.setId(employeeId);
+		EmployeeEntity savedEntity = employeeRepository.save(toUpdatedEntity);
+		return modelMapper.map(savedEntity, EmployeeDto.class);
+	}
+
+	@Override
+	public boolean deleteEmployeeWithId(Long employeeId) {
+		if (employeeExists(employeeId)) {
+			employeeRepository.deleteById(employeeId);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public EmployeeDto patchEmployee(Long employeeId, Map<String, Object> employeeData) {
+		if (!employeeExists(employeeId)) {
+			return null;
+		}
+		try {
+			EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).get();
+			//this is also possible by ReflectionUtils
+			objectMapper.updateValue(employeeEntity, employeeData);
+			return modelMapper.map(employeeRepository.save(employeeEntity), EmployeeDto.class);
+		} catch (JsonMappingException e) {
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+
+	private boolean employeeExists(Long employeeId) {
+		return employeeRepository.existsById(employeeId);
 	}
 }
