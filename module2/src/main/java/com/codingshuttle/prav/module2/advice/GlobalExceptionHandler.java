@@ -13,27 +13,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex) {
+	public ResponseEntity<APIResponse<?>> handleResourceNotFound(ResourceNotFoundException ex) {
 		ApiError apiError = ApiError
 				.builder()
 				.status(HttpStatus.BAD_REQUEST)
 				.message(ex.getMessage())
 				.build();
-		return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+		return buildErrorResponse(apiError);
 	}
 
+
 	@ExceptionHandler(TechnicalException.class)
-	public ResponseEntity<ApiError> handleTechnicalException(TechnicalException ex) {
+	public ResponseEntity<APIResponse<?>> handleTechnicalException(TechnicalException ex) {
 		ApiError apiError = ApiError
 				.builder()
 				.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.message(ex.getMessage())
 				.build();
-		return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
+		return buildErrorResponse(apiError);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ApiError> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+	public ResponseEntity<APIResponse<?>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 		List<String> errors = ex.getBindingResult()
 				.getFieldErrors()
 				.stream()
@@ -47,7 +48,12 @@ public class GlobalExceptionHandler {
 				.errors(errors)
 				.build();
 
-		return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+		return buildErrorResponse(apiError);
 	}
+
+	private ResponseEntity<APIResponse<?>> buildErrorResponse(ApiError apiError) {
+		return new ResponseEntity<>(new APIResponse<>(apiError), apiError.getStatus());
+	}
+
 
 }
