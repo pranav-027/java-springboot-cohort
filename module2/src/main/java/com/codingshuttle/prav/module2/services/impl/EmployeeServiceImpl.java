@@ -2,6 +2,8 @@ package com.codingshuttle.prav.module2.services.impl;
 
 import com.codingshuttle.prav.module2.dto.EmployeeDto;
 import com.codingshuttle.prav.module2.entities.EmployeeEntity;
+import com.codingshuttle.prav.module2.exceptions.ResourceNotFoundException;
+import com.codingshuttle.prav.module2.exceptions.TechnicalException;
 import com.codingshuttle.prav.module2.repositories.EmployeeRepository;
 import com.codingshuttle.prav.module2.services.EmployeeService;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -53,6 +55,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public EmployeeDto updateEmployeeById(Long employeeId, EmployeeDto employeeDto) {
+		if (!employeeExists(employeeId)) throw new ResourceNotFoundException("Employee with id: " + employeeId + " does not exist");
 		EmployeeEntity toUpdatedEntity = modelMapper.map(employeeDto, EmployeeEntity.class);
 		toUpdatedEntity.setId(employeeId);
 		EmployeeEntity savedEntity = employeeRepository.save(toUpdatedEntity);
@@ -79,9 +82,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 			objectMapper.updateValue(employeeEntity, employeeData);
 			return modelMapper.map(employeeRepository.save(employeeEntity), EmployeeDto.class);
 		} catch (JsonMappingException e) {
-			log.error(e.getMessage());
+			throw new TechnicalException("Error while patching employee with id: " + employeeId, e);
 		}
-		return null;
 	}
 
 	private boolean employeeExists(Long employeeId) {
