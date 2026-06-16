@@ -37,8 +37,8 @@ public class DepartmentController {
 	}
 
 	@GetMapping(path = "/{deptId}")
-	public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable Long deptId) {
-		return ResponseEntity.ok(departmentService.getDepartmentById(deptId));
+	public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable Long employeeId) {
+		return ResponseEntity.ok(departmentService.getDepartmentById(employeeId));
 	}
 
 	@PutMapping(path = "/{deptId}")
