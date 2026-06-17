@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,6 +21,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 @Table(name = "patients")
 public class Patient {
 

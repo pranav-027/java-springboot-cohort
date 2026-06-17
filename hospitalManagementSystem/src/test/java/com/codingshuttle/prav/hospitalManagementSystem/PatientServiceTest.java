@@ -4,6 +4,7 @@ import com.codingshuttle.prav.hospitalManagementSystem.model.BloodGroupStat;
 import com.codingshuttle.prav.hospitalManagementSystem.model.IPatientResponse;
 import com.codingshuttle.prav.hospitalManagementSystem.model.PatientInfo;
 import com.codingshuttle.prav.hospitalManagementSystem.repository.PatientRepository;
+import com.codingshuttle.prav.hospitalManagementSystem.service.PatientService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,9 @@ public class PatientServiceTest {
 
 	@Autowired
 	PatientRepository patientRepository;
+
+	@Autowired
+	PatientService patientService;
 
 	@Test
 	void test() {
@@ -37,6 +41,11 @@ public class PatientServiceTest {
 	@Test
 	void testUpdate() {
 		System.out.println(patientRepository.updatePatientNameWithId("Johnson Doe", 1L));
+	}
+
+	@Test
+	void testTran() {
+		patientService.testTransaction();
 	}
 
 }
