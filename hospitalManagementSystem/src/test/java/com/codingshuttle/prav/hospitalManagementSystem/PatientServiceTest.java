@@ -1,7 +1,6 @@
 package com.codingshuttle.prav.hospitalManagementSystem;
 
 import com.codingshuttle.prav.hospitalManagementSystem.model.BloodGroupStat;
-import com.codingshuttle.prav.hospitalManagementSystem.model.IPatientResponse;
 import com.codingshuttle.prav.hospitalManagementSystem.model.PatientInfo;
 import com.codingshuttle.prav.hospitalManagementSystem.repository.PatientRepository;
 import com.codingshuttle.prav.hospitalManagementSystem.service.PatientService;
@@ -46,6 +45,11 @@ public class PatientServiceTest {
 	@Test
 	void testTran() {
 		patientService.testTransaction();
+	}
+
+	@Test
+	void deletePatientById() {
+		patientService.deletePatient(2L);
 	}
 
 }

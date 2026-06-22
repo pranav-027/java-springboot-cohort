@@ -20,3 +20,10 @@ INSERT IGNORE INTO hospital_db.patients (
       ('Lucas Hernandez', 'lucas.hernandez@example.com', 'MALE', '1998-01-25', 'AB_POSITIVE'),
       ('Mia Lopez', 'mia.lopez@example.com', 'FEMALE', '1995-11-17', 'A_NEGATIVE'),
       ('Ethan Gonzalez', 'ethan.gonzalez@example.com', 'MALE', '1992-08-09', 'B_NEGATIVE');
+
+
+
+INSERT IGNORE INTO doctor (name, specialization, email) VALUES
+                                                     ('Dr. Arjun Sharma', 'Cardiology', 'arjun.sharma@hospital.com'),
+                                                     ('Dr. Priya Mehta', 'Neurology', 'priya.mehta@hospital.com'),
+                                                     ('Dr. Rohan Iyer', 'Orthopedics', 'rohan.iyer@hospital.com');
