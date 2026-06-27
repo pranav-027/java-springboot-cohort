@@ -1,6 +1,7 @@
 package com.codingshuttle.prav.production_ready_features.controllers;
 
 import com.codingshuttle.prav.production_ready_features.dto.PostDto;
+import com.codingshuttle.prav.production_ready_features.factory.RestResponseFactory;
 import com.codingshuttle.prav.production_ready_features.services.PostService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,8 @@ public class PostController {
 
 	@PostMapping
 	public ResponseEntity<PostDto> createNewPost(@RequestBody  PostDto postDto) {
-		return ResponseEntity.ok(postService.createNewPost(postDto));
+		System.out.println("Creating new post: " + postDto.getTitle());
+		return RestResponseFactory.buildOkResponse(postService.createNewPost(postDto));
 	}
 
 	@GetMapping("/{postId}")
