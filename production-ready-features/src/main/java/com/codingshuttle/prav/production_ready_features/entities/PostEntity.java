@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 @Entity
 @NoArgsConstructor
@@ -16,7 +17,8 @@ import lombok.Setter;
 @Table(name = "posts")
 @Getter
 @Setter
-public class PostEntity {
+@Audited
+public class PostEntity extends AuditLineEntity {
 
 
 	@Id
