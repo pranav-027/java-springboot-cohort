@@ -29,6 +29,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public PostDto createNewPost(PostDto postDto) {
 		PostEntity postEntity = modelMapper.map(postDto, PostEntity.class);
+		postEntity.setId(null); // Ensure the ID is null so that a new entity is created
 		return modelMapper.map(postEntityRepository.save(postEntity), PostDto.class);
 	}
 
