@@ -3,12 +3,14 @@ package com.codingshuttle.prav.production_ready_features.clients.impl;
 import com.codingshuttle.prav.production_ready_features.clients.TestApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+@Slf4j
 @Service
 public class TestApiClientImpl implements TestApiClient {
 
@@ -43,6 +45,7 @@ public class TestApiClientImpl implements TestApiClient {
 
 	@Override
 	public JsonNode getCompData() {
+		log.info("Getting Comp data from WCA");
 		JsonNode response = wcaRest.get()
 				.retrieve()
 				.body(JsonNode.class);

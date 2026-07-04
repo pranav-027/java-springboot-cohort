@@ -6,7 +6,8 @@ import com.codingshuttle.prav.production_ready_features.dto.EmployeeDto;
 import com.codingshuttle.prav.production_ready_features.exceptions.ResourceNotFoundException;
 import java.util.Arrays;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
@@ -16,10 +17,11 @@ import org.springframework.web.client.RestClient;
 
 
 @Service
-@Slf4j
 public class EmployeeClientImpl implements EmployeeClient {
 
 	private final RestClient restClient;
+
+	Logger log = LoggerFactory.getLogger(EmployeeClientImpl.class);
 
 	public EmployeeClientImpl(@Qualifier("employeeRestClient") RestClient restClient) {
 		this.restClient = restClient;
@@ -73,7 +75,7 @@ public class EmployeeClientImpl implements EmployeeClient {
 			return apiResponse.getBody().getData();
 
 		} catch (Exception e) {
-			log.error("Something went wong");
+			log.error("Something went wong", e);
 			throw new RuntimeException(e);
 		}
 	}
