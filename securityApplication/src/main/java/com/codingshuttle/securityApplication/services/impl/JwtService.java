@@ -1,0 +1,55 @@
+package com.codingshuttle.securityApplication.services.impl;
+
+import com.codingshuttle.securityApplication.entities.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.Set;
+
+@Service
+public class JwtService {
+
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
+
+    private SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
+
+    public String generateToken(User user) {
+      return Jwts.builder()
+                .subject(user.getId().toString())
+                .claim("email", user.getEmail())
+                .claim("roles", Set.of("ADMIN", "USER")) // Add roles as needed
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60))
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build().parseSignedClaims(token)
+                .getPayload();
+
+        return claims.getSubject() != null ? Long.valueOf(claims.getSubject()) : null;
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSecretKey())
+                    .build().parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+}

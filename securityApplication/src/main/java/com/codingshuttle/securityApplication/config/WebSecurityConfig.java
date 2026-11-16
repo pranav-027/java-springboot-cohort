@@ -2,9 +2,12 @@ package com.codingshuttle.securityApplication.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,28 +29,36 @@ public class WebSecurityConfig {
         return http
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/posts").permitAll()
-                                .requestMatchers("/posts/**").hasAnyRole("ADMIN")
+                                .requestMatchers("/posts", "/error", "/auth/**").permitAll()
+                                .requestMatchers("/posts/**").hasAnyRole("ADMIN","USER")
                         .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.
+                        sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .formLogin(Customizer.withDefaults())
                 .build();
     }
 
     @Bean
-    UserDetailsService userDetailsService() {
-        UserDetails basicUser = User.withUsername("prav")
-                .password(passwordEncoder().encode("sad"))
-                .roles("USER")
-                .build();
-
-        UserDetails adminUser = User.withUsername("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(basicUser, adminUser);
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
+//    @Bean
+//    UserDetailsService userDetailsService() {
+//        UserDetails basicUser = User.withUsername("prav")
+//                .password(passwordEncoder().encode("sad"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails adminUser = User.withUsername("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(basicUser, adminUser);
+//    }
+//
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
