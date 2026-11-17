@@ -1,18 +1,24 @@
 package com.codingshuttle.securityApplication.services.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.codingshuttle.securityApplication.dtos.PostDto;
 import com.codingshuttle.securityApplication.entities.PostEntity;
+import com.codingshuttle.securityApplication.entities.User;
 import com.codingshuttle.securityApplication.exceptions.ResourceNotFoundException;
 import com.codingshuttle.securityApplication.repository.PostEntityRepository;
 import com.codingshuttle.securityApplication.services.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostServiceImpl implements PostService {
 
 	private final ModelMapper modelMapper;
@@ -36,6 +42,13 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostDto getPostById(Long postId) throws Throwable {
+
+		UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+		User user  = (User) Objects.requireNonNull(authentication).getPrincipal();
+
+		log.info("User {}", user);
+		log.info("{}", authentication.getDetails());
+
 		PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 		return modelMapper.map(postEntity, PostDto.class);
 	}

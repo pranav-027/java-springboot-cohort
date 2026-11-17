@@ -41,6 +41,15 @@ public class JwtService {
         return claims.getSubject() != null ? Long.valueOf(claims.getSubject()) : null;
     }
 
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build().parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("email", String.class);
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parser()

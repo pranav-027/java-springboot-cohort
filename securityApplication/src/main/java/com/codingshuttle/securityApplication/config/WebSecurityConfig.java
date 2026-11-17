@@ -1,5 +1,6 @@
 package com.codingshuttle.securityApplication.config;
 
+import com.codingshuttle.securityApplication.filters.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,11 +16,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
 
 //    formLogin(formLoginConfig -> formLoginConfig.loginPage("newLogin.html"))
 
@@ -27,10 +34,11 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
 
         return http
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/posts", "/error", "/auth/**").permitAll()
-                                .requestMatchers("/posts/**").hasAnyRole("ADMIN","USER")
+//                                .requestMatchers("/posts/**").hasAnyRole("ADMIN","USER")
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.
