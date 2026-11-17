@@ -1,6 +1,7 @@
 package com.codingshuttle.securityApplication.config;
 
 import com.codingshuttle.securityApplication.filters.JwtAuthFilter;
+import com.codingshuttle.securityApplication.filters.LoggingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,9 +24,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final LoggingFilter loggingFilter;
 
-    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter, LoggingFilter loggingFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.loggingFilter = loggingFilter;
     }
 
 //    formLogin(formLoginConfig -> formLoginConfig.loginPage("newLogin.html"))
@@ -35,6 +38,7 @@ public class WebSecurityConfig {
 
         return http
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loggingFilter, JwtAuthFilter.class)
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/posts", "/error", "/auth/**").permitAll()
