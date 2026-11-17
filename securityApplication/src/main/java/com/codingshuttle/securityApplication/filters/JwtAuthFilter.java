@@ -2,6 +2,7 @@ package com.codingshuttle.securityApplication.filters;
 
 import com.codingshuttle.securityApplication.entities.User;
 import com.codingshuttle.securityApplication.services.impl.JwtService;
+import com.codingshuttle.securityApplication.services.impl.SessionsService;
 import com.codingshuttle.securityApplication.services.impl.UserServiceAdaptor;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,12 +27,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserServiceAdaptor userService;
+    private final SessionsService sessionsService;
 
     private final HandlerExceptionResolver handlerExceptionResolver;
 
-    public JwtAuthFilter(JwtService jwtService, UserServiceAdaptor userService, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) {
+    public JwtAuthFilter(JwtService jwtService, UserServiceAdaptor userService, SessionsService sessionsService, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) {
         this.jwtService = jwtService;
         this.userService = userService;
+        this.sessionsService = sessionsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
@@ -49,6 +52,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = requestHeaderToken.substring(7); // Remove "Bearer " w
 
             Long userId = jwtService.getUserIdFromToken(token);
+
+            if (!sessionsService.isSessionValid(userId, token)) {
+                log.info("Invalid session for user ID: {}", userId);
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 log.info("Authenticated user with ID: {}", userId);

@@ -22,13 +22,15 @@ public class AuthService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final SessionsService sessionsService;
 
-    public AuthService(JwtService jwtService, UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthService(JwtService jwtService, UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, SessionsService sessionsService) {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.sessionsService = sessionsService;
     }
 
     public UserDto signUp(SignUpDto request) {
@@ -52,6 +54,8 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
         assert user != null;
-        return jwtService.generateToken(user);
+        String token = jwtService.generateToken(user);
+        sessionsService.saveSession(user.getId(), token);
+        return token;
     }
 }
