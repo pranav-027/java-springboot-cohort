@@ -49,6 +49,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
+            final String userAgent = request.getHeader("User-Agent");
+            log.info("User-Agent: {}", userAgent);
+
             String token = requestHeaderToken.substring(7); // Remove "Bearer " w
 
             Long userId = jwtService.getUserIdFromToken(token);
