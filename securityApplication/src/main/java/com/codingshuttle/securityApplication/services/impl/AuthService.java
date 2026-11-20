@@ -1,6 +1,7 @@
 package com.codingshuttle.securityApplication.services.impl;
 
 import com.codingshuttle.securityApplication.dtos.LoginDto;
+import com.codingshuttle.securityApplication.dtos.LoginResponse;
 import com.codingshuttle.securityApplication.dtos.SignUpDto;
 import com.codingshuttle.securityApplication.dtos.UserDto;
 import com.codingshuttle.securityApplication.entities.User;
@@ -10,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,15 +47,37 @@ public class AuthService {
         return modelMapper.map(createdUser, UserDto.class);
     }
 
-    public String login(LoginDto request) {
+    public LoginResponse login(LoginDto request) {
         Authentication authentication = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(request.getEmail(), request.getPassword()));
         User user = (User) authentication.getPrincipal();
         if (!authentication.isAuthenticated() && user == null) {
             throw new BadCredentialsException("Invalid email or password");
         }
         assert user != null;
-        String token = jwtService.generateToken(user);
-        sessionsService.saveSession(user.getId(), token);
-        return token;
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        sessionsService.saveSession(user.getId(), refreshToken);
+
+        return LoginResponse.builder()
+                .id(user.getId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public LoginResponse refreshToken(String refreshToken) {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId).orElseThrow(() -> new BadCredentialsException("User not found"));
+
+        String newAccessToken = jwtService.generateAccessToken(user);
+
+        sessionsService.saveSession(user.getId(), refreshToken);
+
+        return LoginResponse.builder()
+                .id(user.getId())
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }

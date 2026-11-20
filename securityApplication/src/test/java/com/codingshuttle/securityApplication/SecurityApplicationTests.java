@@ -20,7 +20,7 @@ class SecurityApplicationTests {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 
-		String token = jwtService.generateToken(user);
+		String token = jwtService.generateAccessToken(user);
 
 		System.out.println(token);
 
